@@ -1,0 +1,470 @@
+#+TITLE: esp32 Fall Detector With mpu6050
+#+AUTHOR: Arbab Khan
+#+EMAIL: arbabashruff@gmail.com
+#+DESCRIPTION: Use an esp32 along with a mpu6050 to monitor sudden increases in velocity to detect falls.
+
+[[file:assets/images/device.jpg]]
+[[file:assets/images/message.jpg]]
+[[file:assets/images/log.png]]
+
+* Table Of Contents
+:PROPERTIES:
+:TOC: :include all :ignore this
+:END:
+:CONTENTS:
+- [[#about][About]]
+- [[#requirements][Requirements]]
+  - [[#hardware][Hardware]]
+    - [[#esp32-microcontroller][esp32 Microcontroller]]
+    - [[#mpu6050-accelerometer][mpu6050 Accelerometer]]
+    - [[#jumper-wires][Jumper Wires]]
+    - [[#microusb-cabel][MicroUSB Cabel]]
+    - [[#optionally-a-breadboard][(Optionally) A Breadboard]]
+  - [[#software][Software]]
+    - [[#twilio-credentials][Twilio Credentials]]
+      - [[#obtaining-api-tokens-for-twilio-account][Obtaining API tokens for Twilio Account]]
+        - [[#signup-or-login-into-twilio][Signup or login into twilio:]]
+        - [[#navigate-to-the-console][Navigate to the Console:]]
+        - [[#access-api-credentials][Access API Credentials:]]
+    - [[#how-to-obtain-a-google-api-key][How to Obtain a Google API Key]]
+      - [[#step-1-go-to-the-google-cloud-console][Step 1: Go to the Google Cloud Console]]
+      - [[#step-2-create-or-select-a-project][Step 2: Create or Select a Project]]
+      - [[#step-3-enable-apis-and-services][Step 3: Enable APIs and Services]]
+      - [[#step-4-generate-credentials][Step 4: Generate Credentials]]
+- [[#what-to-install][What To Install]]
+  - [[#arduinoide][ArduinoIDE]]
+  - [[#poetry][Poetry]]
+- [[#setup][Setup]]
+  - [[#wiring][Wiring]]
+  - [[#upload-the-sketch-to-the-esp32][Upload the sketch to the esp32]]
+    - [[#install-esp32-board-support][Install ESP32 Board Support]]
+    - [[#install-required-libraries][Install Required Libraries]]
+    - [[#open-the-provided-sketch][Open the Provided Sketch]]
+    - [[#update-wifi-credentials][Update WiFi Credentials]]
+    - [[#connect-the-esp32-to-your-computer][Connect the ESP32 to Your Computer]]
+    - [[#configure-board-and-port-settings][Configure Board and Port Settings]]
+    - [[#upload-the-sketch][Upload the Sketch]]
+    - [[#verify-the-output][Verify the Output]]
+    - [[#troubleshooting][Troubleshooting]]
+    - [[#notes][Notes]]
+  - [[#how-to-open-port-12345-on-your-device][How to Open Port 12345 on Your Device]]
+  - [[#determine-your-operating-system][Determine Your Operating System]]
+    - [[#open-port-on-windows][Open Port on Windows]]
+    - [[#open-port-on-macos][Open Port on macOS]]
+    - [[#open-port-on-linux][Open Port on Linux]]
+- [[#execution][Execution]]
+- [[#first-run][First Run]]
+  - [[#esp32-server_url][ESP32 server_url]]
+  - [[#google_api-key][GOOGLE_API key]]
+  - [[#twilio][Twilio]]
+  - [[#twilio-sos_recipient_phone_number][Twilio sos_recipient_phone_number]]
+  - [[#fall-threshold][Fall Threshold]]
+  - [[#rolling-window-size][Rolling Window Size]]
+  - [[#no-fall-reset-count][No Fall Reset Count]]
+  - [[#fall-geolocation-trigger][Fall Geolocation Trigger]]
+  - [[#acceleration-due-to-gravity][Acceleration Due To Gravity]]
+  - [[#csv-file][CSV File]]
+- [[#how-this-works][How This Works]]
+- [[#limitations--workaround][Limitations & Workaround]]
+  - [[#range][Range]]
+  - [[#accuracy-of-geolocation][Accuracy Of Geolocation]]
+  - [[#powersupply][PowerSupply]]
+- [[#contributing][Contributing]]
+:END:
+* About
+:PROPERTIES:
+:CUSTOM_ID: about
+:END:
+This is a custom project that I made for my school science exhibition that uses an esp32 and a mpu6050 to send data over a tcp port by a script utilizing the websocket protocol to recieve data wirelessly. The data is then processed by the script and if a fall is detected, an SOS alert is sent to your mobile phone number through the [[https://twilio.com][twilio]] python library.
+* Requirements
+:PROPERTIES:
+:CUSTOM_ID: requirements
+:END:
+** Hardware
+:PROPERTIES:
+:CUSTOM_ID: hardware
+:END:
+*** esp32 Microcontroller
+:PROPERTIES:
+:CUSTOM_ID: esp32-microcontroller
+:END:
+This code is written for an esp32 but it shouldn’t be hard to modify to code run on an esp8266. I picked an esp32 over an esp8266 because of its more powerful cpu, faster wifi, more GPIOs and support for Bluetooth 4.2 and BLE.
+*** mpu6050 Accelerometer
+:PROPERTIES:
+:CUSTOM_ID: mpu6050-accelerometer
+:END:
+This code assumes you’re using an mpu6050 but it should be possible to modify the code to work with an AXL350 or other accelerometers.
+*** Jumper Wires
+:PROPERTIES:
+:CUSTOM_ID: jumper-wires
+:END:
+Jumper wires are required to wire the esp32 and the mpu6050.
+*** MicroUSB Cabel
+:PROPERTIES:
+:CUSTOM_ID: microusb-cabel
+:END:
+The esp32 uses a microusb cabel to connect to your developement machine. I am also using the microusb cabel to power the esp32 instead of an extenal battery.
+*** (Optionally) A Breadboard
+:PROPERTIES:
+:CUSTOM_ID: optionally-a-breadboard
+:END:
+I would recommend soldering the headerpins to the esp32 and the mpu6050 but if you aren’t comfortable with that, a breadboard would also work.
+** Software
+:PROPERTIES:
+:CUSTOM_ID: software
+:END:
+*** Twilio Credentials
+:PROPERTIES:
+:CUSTOM_ID: twilio-credentials
+:END:
+**** Obtaining API tokens for Twilio Account
+:PROPERTIES:
+:CUSTOM_ID: obtaining-api-tokens-for-twilio-account
+:END:
+***** Signup or login into [[https://twilio.com][twilio]]:
+:PROPERTIES:
+:CUSTOM_ID: signup-or-login-into-twilio
+:END:
+- If you don’t have a Twilio account yet, sign up for one.
+  - If you already have a account, sign in using your credentials.
+***** Navigate to the Console:
+:PROPERTIES:
+:CUSTOM_ID: navigate-to-the-console
+:END:
+- Once logged in. go to the Twilio Console by clicking on the Console link at the top right corner of the page.
+***** Access API Credentials:
+:PROPERTIES:
+:CUSTOM_ID: access-api-credentials
+:END:
+From the Twilio Console, copy the =Account SID= , =Auth Token= and =My Twilio phone number=. These are the credentials required for our script.
+*** How to Obtain a Google API Key
+:PROPERTIES:
+:CUSTOM_ID: how-to-obtain-a-google-api-key
+:END:
+This guide provides step-by-step instructions for obtaining a Google API key.
+
+**** Step 1: Go to the Google Cloud Console
+:PROPERTIES:
+:CUSTOM_ID: step-1-go-to-the-google-cloud-console
+:END:
+1. Open your browser and navigate to the Google Cloud Console:
+   - [[https://console.cloud.google.com/][Google Cloud Console]]
+
+**** Step 2: Create or Select a Project
+:PROPERTIES:
+:CUSTOM_ID: step-2-create-or-select-a-project
+:END:
+1. Log in with your Google account if required.
+2. Click the project dropdown at the top of the page.
+3. Select an existing project or create a new one:
+   - To create a new project:
+     1. Click "New Project."
+     2. Provide a name for your project.
+     3. (Optional) Select an organization or location.
+     4. Click "Create."
+
+**** Step 3: Enable APIs and Services
+:PROPERTIES:
+:CUSTOM_ID: step-3-enable-apis-and-services
+:END:
+1. In your project dashboard, click "APIs & Services" in the left-hand menu.
+2. Select "Library."
+3. Search for the API you need (e.g., Google Maps API, YouTube API).
+4. Click the API and then click "Enable."
+
+**** Step 4: Generate Credentials
+:PROPERTIES:
+:CUSTOM_ID: step-4-generate-credentials
+:END:
+1. Go to the "APIs & Services" menu and click "Credentials."
+2. Click "+ CREATE CREDENTIALS" and select "API key."
+3. The system will generate an API key.
+4. Copy the API key and store it in a secure location.
+
+* What To Install
+:PROPERTIES:
+:CUSTOM_ID: what-to-install
+:END:
+** ArduinoIDE
+:PROPERTIES:
+:CUSTOM_ID: arduinoide
+:END:
+Download the arduinoIDE from [[https://arduino.cc/en/software][here]].
+** Poetry
+:PROPERTIES:
+:CUSTOM_ID: poetry
+:END:
+- [[https://python-poetry.org][Poetry]]
+
+* Setup
+:PROPERTIES:
+:CUSTOM_ID: setup
+:END:
+** Wiring
+:PROPERTIES:
+:CUSTOM_ID: wiring
+:END:
+MPU6050 Pin  | ESP32 Pin
+-------------------------
+VCC          | 3.3V or 5V (*check your MPU6050 module*)
+GND          | GND
+SCL          | GPIO 22 (default I2C SCL on ESP32)
+SDA          | GPIO 21 (default I2C SDA on ESP32)
+** Upload the sketch to the esp32
+:PROPERTIES:
+:CUSTOM_ID: upload-the-sketch-to-the-esp32
+:END:
+*** Install ESP32 Board Support
+:PROPERTIES:
+:CUSTOM_ID: install-esp32-board-support
+:END:
+1. Open the Arduino IDE.
+2. Go to "File" → "Preferences."
+3. In the "Additional Boards Manager URLs" field, add the following URL:
+   - `https://dl.espressif.com/dl/package_esp32_index.json`
+4. Click "OK."
+5. Go to "Tools" → "Board" → "Boards Manager."
+6. Search for "ESP32."
+7. Install the package labeled "esp32 by Espressif Systems."
+
+*** Install Required Libraries
+:PROPERTIES:
+:CUSTOM_ID: install-required-libraries
+:END:
+1. Open the Arduino IDE.
+2. Go to "Sketch" → "Include Library" → "Manage Libraries."
+3. Search for and install the following libraries:
+   - `WiFi`
+   - `WebSocketsServer`
+   - `MPU6050`
+   - `HTTPClient`
+
+*** Open the Provided Sketch
+:PROPERTIES:
+:CUSTOM_ID: open-the-provided-sketch
+:END:
+1. Open the sketch.ino file in the arduinoIDE.
+
+*** Update WiFi Credentials
+:PROPERTIES:
+:CUSTOM_ID: update-wifi-credentials
+:END:
+1. Replace the placeholders `youWifiSSID` and `yourWifiPassword` with your WiFi SSID and password.
+
+*** Connect the ESP32 to Your Computer
+:PROPERTIES:
+:CUSTOM_ID: connect-the-esp32-to-your-computer
+:END:
+1. Use a USB cable to connect the ESP32 to your computer.
+2. Ensure the USB cable is capable of data transfer.
+
+*** Configure Board and Port Settings
+:PROPERTIES:
+:CUSTOM_ID: configure-board-and-port-settings
+:END:
+1. Go to "Tools" → "Board."
+2. Select your ESP32 board model (e.g., "ESP32 Dev Module").
+3. Go to "Tools" → "Port."
+4. Select the COM port associated with your ESP32 (e.g., `COM3` on Windows or `/dev/ttyUSB0` on Linux).
+
+*** Upload the Sketch
+:PROPERTIES:
+:CUSTOM_ID: upload-the-sketch
+:END:
+1. Click the "Upload" button (right arrow icon) in the Arduino IDE toolbar.
+2. Monitor the IDE output for the upload progress.
+   - If you see a "Connecting..." message, press and hold the "Boot" button on your ESP32 until the upload starts.
+
+*** Verify the Output
+:PROPERTIES:
+:CUSTOM_ID: verify-the-output
+:END:
+1. Once the upload completes, open the Serial Monitor:
+   - Go to "Tools" → "Serial Monitor."
+   - Set the baud rate to `115200` (as specified in the code).
+2. Check the monitor for messages indicating WiFi connection status, MPU6050 calibration, and WebSocket activity.
+
+*** Troubleshooting
+:PROPERTIES:
+:CUSTOM_ID: troubleshooting
+:END:
+1. If the upload fails:
+   - Ensure the correct board and port are selected.
+   - Check the USB cable and connections.
+   - Press and hold the "Boot" button while uploading.
+2. If the MPU6050 or WebSocket fails:
+   - Check wiring for the MPU6050.
+   - Verify the WiFi credentials.
+   - Ensure the libraries are installed correctly.
+
+*** Notes
+:PROPERTIES:
+:CUSTOM_ID: notes
+:END:
+- Adjust the `delay(50)` in the loop for a different data update rate.
+
+** How to Open Port 12345 on Your Device
+:PROPERTIES:
+:CUSTOM_ID: how-to-open-port-12345-on-your-device
+:END:
+This guide provides instructions to open port 12345 on your device for the WebSocket server.
+
+** Determine Your Operating System
+:PROPERTIES:
+:CUSTOM_ID: determine-your-operating-system
+:END:
+1. Identify whether you are using:
+   - Windows
+   - macOS
+   - Linux
+
+*** Open Port on Windows
+:PROPERTIES:
+:CUSTOM_ID: open-port-on-windows
+:END:
+1. Open the Command Prompt as an Administrator:
+   - Press `Win + R`, type `cmd`, and press `Enter`.
+   - Right-click "Command Prompt" and select "Run as Administrator."
+
+2. Add a Firewall Rule to Open the Port:
+   - Run the following command:
+     ```shell
+     netsh advfirewall firewall add rule name="Open Port 12345" dir=in action=allow protocol=TCP localport=12345
+     ```
+   - For UDP, replace `TCP` with `UDP` in the command.
+
+3. Verify the Rule:
+   - Run:
+     ```shell
+     netsh advfirewall firewall show rule name="Open Port 12345"
+     ```
+
+*** Open Port on macOS
+:PROPERTIES:
+:CUSTOM_ID: open-port-on-macos
+:END:
+1. Open the Terminal:
+   - Use `Cmd + Space` to open Spotlight and type "Terminal."
+
+2. Modify the Firewall Settings:
+   - Run the following command to allow incoming connections on port 12345:
+     ```shell
+     sudo pfctl -e
+     echo "pass in proto tcp from any to any port 12345" | sudo pfctl -f -
+     ```
+
+3. Verify the Configuration:
+   - Check active rules:
+     ```shell
+     sudo pfctl -sr
+     ```
+
+*** Open Port on Linux
+:PROPERTIES:
+:CUSTOM_ID: open-port-on-linux
+:END:
+If you’re on linux, you’ll probably figure it out :)
+
+* Execution
+:PROPERTIES:
+:CUSTOM_ID: execution
+:END:
+- Power the esp32
+   A red led on the esp32 along with a green led on the mpu6050 should start glowing.
+   
+- Clone the repo
+   =git clone https://github.com/strix007/esp32_fall-detector.git=
+
+- CD into the directory
+    =cd esp32_fall-detector=
+
+- Run Poetry
+      =poetry install=
+
+- Run the script
+  =poetry run python liveFallDetector.py=
+
+* First Run
+:PROPERTIES:
+:CUSTOM_ID: first-run
+:END:
+I recommend doing the first run with the esp32 connected to your developement device and to check the ouput of the =Serial Monitor=. Upon the initial execution, script will ask you for details like
+** ESP32 server_url
+:PROPERTIES:
+:CUSTOM_ID: esp32-server_url
+:END:
+This is the tcp port where the esp32 send the data and the script recieves it. The IP address should be the IP the esp32 prints in the serial monitor while the port should be the TCP port you opened. *NOTE:* The TCP port should be the same in both the arduino sketch and the python script.
+** GOOGLE_API key
+:PROPERTIES:
+:CUSTOM_ID: google_api-key
+:END:
+This should be the api key you got from the google cloud console.
+** Twilio
+:PROPERTIES:
+:CUSTOM_ID: twilio
+:END:
+These all should be tokens you obtained beforehand from the above instrcutions.
+** Twilio sos_recipient_phone_number
+:PROPERTIES:
+:CUSTOM_ID: twilio-sos_recipient_phone_number
+:END:
+This should be the phone number of the person you want to send the message to.
+** Fall Threshold
+:PROPERTIES:
+:CUSTOM_ID: fall-threshold
+:END:
+This is the value of the fall. When a magniude higher than this is detected, a fall is triggered. Find out a value you are comfortable with by experimenting.
+** Rolling Window Size
+:PROPERTIES:
+:CUSTOM_ID: rolling-window-size
+:END:
+Value by which the noise should be smoothened.
+** No Fall Reset Count
+:PROPERTIES:
+:CUSTOM_ID: no-fall-reset-count
+:END:
+The value that determined when a fall count is reset.
+** Fall Geolocation Trigger
+:PROPERTIES:
+:CUSTOM_ID: fall-geolocation-trigger
+:END:
+Value by which the fall mechanish is triggered.
+** Acceleration Due To Gravity
+:PROPERTIES:
+:CUSTOM_ID: acceleration-due-to-gravity
+:END:
+¯\_(ツ)_/¯
+** CSV File
+:PROPERTIES:
+:CUSTOM_ID: csv-file
+:END:
+Name of the .csv file where the data is logged.
+* How This Works
+:PROPERTIES:
+:CUSTOM_ID: how-this-works
+:END:
+  To make this script work, we are taking the magnitudes of the x,y and z axes and comparing it against a predefined fall threshold we got through trial and error and experimentation. When a value above the threshold is detected, a increment in fall count takes place. When the fallcount exceeds a certains threshold, the fall mechanish that send a SOS message along with the location is triggered. We are the approach of taking fallcount to reduce fall postives as there can be a simple increase in velocity maginitude with a sudden jerk or motion without it being fall. This approach reduces false postives. We are also getting the location of the esp32 by scanning the local Wifis in the area and sending their IP addressed to the google geolocation api.
+* Limitations & Workaround
+:PROPERTIES:
+:CUSTOM_ID: limitations--workaround
+:END:
+** Range
+:PROPERTIES:
+:CUSTOM_ID: range
+:END:
+The esp32 only works when a wifi is connected to it. The average range of an esp32 is around 50 to 200 meters. We can get around this by carrying a mobile hotspot.
+** Accuracy Of Geolocation
+:PROPERTIES:
+:CUSTOM_ID: accuracy-of-geolocation
+:END:
+The accuracy of the geolocation differs wildly case-by-case due to factors like location, range, type of network, etc. A possible worksound this is to use a GPS module like a NEO-6M. I decided against this approach  because of the added bulk of the module along with the antenna and also the issue of powering the module. The esp32 does not have sufficient voltage to power both the mpu6050 and the NEO-6M together. We would need to use an external powersupply like a 9V battery or a lithium-ion battery but those would require addition voltage regulators as esp32 lacks an onboard external voltage regulator. This would be even more added bulk.
+** PowerSupply
+:PROPERTIES:
+:CUSTOM_ID: powersupply
+:END:
+As discussed above, the esp32 lacks a onboard external voltage regulator so to power it, I would recommend a small battery pack or a lithium ion battery connected to microusb.
+* Contributing
+:PROPERTIES:
+:CUSTOM_ID: contributing
+:END:
+This is my first time playing around with robotics so I lack a lot of insight into these kinds of projects. Contributions such as PRs, Issues and other forms of engagements are absolutely encouraged and highly appreciated.

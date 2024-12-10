@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "livefalldetector"
+version = "0.1.0"
+description = "Detect falls with an esp32 and a mpu6050"
+authors = ["Arbab Khan <arbabashruff@gmail.com>"]
+license = "GPL-3.0"
+readme = "README.org"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+telethon = "^1.38.1"
+websocket = "^0.2.1"
+requests = "^2.32.3"
+twilio = "^9.3.8"
+websocket-client = "^1.8.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

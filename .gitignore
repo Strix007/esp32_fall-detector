@@ -1,0 +1,6 @@
+*.csv
+env
+*.cfg
+*#*
+__pycache__
+*config*
