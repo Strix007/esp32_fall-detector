@@ -27,10 +27,10 @@
         - [[#navigate-to-the-console][Navigate to the Console:]]
         - [[#access-api-credentials][Access API Credentials:]]
     - [[#how-to-obtain-a-google-api-key][How to Obtain a Google API Key]]
-      - [[#step-1-go-to-the-google-cloud-console][Step 1: Go to the Google Cloud Console]]
-      - [[#step-2-create-or-select-a-project][Step 2: Create or Select a Project]]
-      - [[#step-3-enable-apis-and-services][Step 3: Enable APIs and Services]]
-      - [[#step-4-generate-credentials][Step 4: Generate Credentials]]
+      - [[#go-to-the-google-cloud-console][Go to the Google Cloud Console]]
+      - [[#create-or-select-a-project][Create or Select a Project]]
+      - [[#enable-apis-and-services][Enable APIs and Services]]
+      - [[#generate-credentials][Generate Credentials]]
 - [[#what-to-install][What To Install]]
   - [[#arduinoide][ArduinoIDE]]
   - [[#poetry][Poetry]]
@@ -143,43 +143,43 @@ From the Twilio Console, copy the =Account SID= , =Auth Token= and =My Twilio ph
 :END:
 This guide provides step-by-step instructions for obtaining a Google API key.
 
-**** Step 1: Go to the Google Cloud Console
+**** Go to the Google Cloud Console
 :PROPERTIES:
-:CUSTOM_ID: step-1-go-to-the-google-cloud-console
+:CUSTOM_ID: go-to-the-google-cloud-console
 :END:
 1. Open your browser and navigate to the Google Cloud Console:
    - [[https://console.cloud.google.com/][Google Cloud Console]]
 
-**** Step 2: Create or Select a Project
+**** Create or Select a Project
 :PROPERTIES:
-:CUSTOM_ID: step-2-create-or-select-a-project
+:CUSTOM_ID: create-or-select-a-project
 :END:
-1. Log in with your Google account if required.
-2. Click the project dropdown at the top of the page.
-3. Select an existing project or create a new one:
+-  Log in with your Google account if required.
+-  Click the project dropdown at the top of the page.
+-  Select an existing project or create a new one:
    - To create a new project:
-     1. Click "New Project."
-     2. Provide a name for your project.
-     3. (Optional) Select an organization or location.
-     4. Click "Create."
+     -  Click "New Project."
+     -  Provide a name for your project.
+     -  (Optional) Select an organization or location.
+      - Click "Create."
 
-**** Step 3: Enable APIs and Services
+**** Enable APIs and Services
 :PROPERTIES:
-:CUSTOM_ID: step-3-enable-apis-and-services
+:CUSTOM_ID: enable-apis-and-services
 :END:
-1. In your project dashboard, click "APIs & Services" in the left-hand menu.
-2. Select "Library."
-3. Search for the API you need (e.g., Google Maps API, YouTube API).
-4. Click the API and then click "Enable."
+-  In your project dashboard, click "APIs & Services" in the left-hand menu.
+-  Select "Library."
+-  Search for the API you need (e.g., Google Maps API, YouTube API).
+-  Click the API and then click "Enable."
 
-**** Step 4: Generate Credentials
+**** Generate Credentials
 :PROPERTIES:
-:CUSTOM_ID: step-4-generate-credentials
+:CUSTOM_ID: generate-credentials
 :END:
-1. Go to the "APIs & Services" menu and click "Credentials."
-2. Click "+ CREATE CREDENTIALS" and select "API key."
-3. The system will generate an API key.
-4. Copy the API key and store it in a secure location.
+-  Go to the "APIs & Services" menu and click "Credentials."
+-  Click "+ CREATE CREDENTIALS" and select "API key."
+-  The system will generate an API key.
+-  Copy the API key and store it in a secure location.
 
 * What To Install
 :PROPERTIES:
@@ -204,12 +204,13 @@ Download the arduinoIDE from [[https://arduino.cc/en/software][here]].
 :PROPERTIES:
 :CUSTOM_ID: wiring
 :END:
-MPU6050 Pin  | ESP32 Pin
--------------------------
-VCC          | 3.3V or 5V (*check your MPU6050 module*)
-GND          | GND
-SCL          | GPIO 22 (default I2C SCL on ESP32)
-SDA          | GPIO 21 (default I2C SDA on ESP32)
+| MPU6050 Pin | ESP32 Pin                              |
+|-------------+----------------------------------------|
+| VCC         | 3.3V or 5V (Check your MPU6050 module) |
+| GND         | GND                                    |
+| SCL         | GPIO 22 (default I2C SCL on ESP32)     |
+| SDA         | GPIO 21 (default I2C SDA on ESP32)     |
+
 ** Upload the sketch to the esp32
 :PROPERTIES:
 :CUSTOM_ID: upload-the-sketch-to-the-esp32
@@ -218,61 +219,61 @@ SDA          | GPIO 21 (default I2C SDA on ESP32)
 :PROPERTIES:
 :CUSTOM_ID: install-esp32-board-support
 :END:
-1. Open the Arduino IDE.
-2. Go to "File" → "Preferences."
-3. In the "Additional Boards Manager URLs" field, add the following URL:
-   - `https://dl.espressif.com/dl/package_esp32_index.json`
-4. Click "OK."
-5. Go to "Tools" → "Board" → "Boards Manager."
-6. Search for "ESP32."
-7. Install the package labeled "esp32 by Espressif Systems."
+-  Open the Arduino IDE.
+-  Go to "File" → "Preferences."
+-  In the "Additional Boards Manager URLs" field, add the following URL:
+  - =https://dl.espressif.com/dl/package_esp32_index.json=
+-  Click "OK."
+-  Go to "Tools" → "Board" → "Boards Manager."
+-  Search for "ESP32."
+-  Install the package labeled "esp32 by Espressif Systems."
 
 *** Install Required Libraries
 :PROPERTIES:
 :CUSTOM_ID: install-required-libraries
 :END:
-1. Open the Arduino IDE.
-2. Go to "Sketch" → "Include Library" → "Manage Libraries."
-3. Search for and install the following libraries:
-   - `WiFi`
-   - `WebSocketsServer`
-   - `MPU6050`
-   - `HTTPClient`
+-  Open the Arduino IDE.
+-  Go to "Sketch" → "Include Library" → "Manage Libraries."
+-  Search for and install the following libraries:
+   - =WiFi=
+   - =WebSocketsServer=
+   - =MPU6050=
+   - =HTTPClient=
 
 *** Open the Provided Sketch
 :PROPERTIES:
 :CUSTOM_ID: open-the-provided-sketch
 :END:
-1. Open the sketch.ino file in the arduinoIDE.
+-  Open the sketch.ino file in the arduinoIDE.
 
 *** Update WiFi Credentials
 :PROPERTIES:
 :CUSTOM_ID: update-wifi-credentials
 :END:
-1. Replace the placeholders `youWifiSSID` and `yourWifiPassword` with your WiFi SSID and password.
+-  Replace the placeholders =youWifiSSID= and =yourWifiPassword= with your WiFi SSID and password.
 
 *** Connect the ESP32 to Your Computer
 :PROPERTIES:
 :CUSTOM_ID: connect-the-esp32-to-your-computer
 :END:
-1. Use a USB cable to connect the ESP32 to your computer.
-2. Ensure the USB cable is capable of data transfer.
+-  Use a USB cable to connect the ESP32 to your computer.
+-  Ensure the USB cable is capable of data transfer.
 
 *** Configure Board and Port Settings
 :PROPERTIES:
 :CUSTOM_ID: configure-board-and-port-settings
 :END:
-1. Go to "Tools" → "Board."
-2. Select your ESP32 board model (e.g., "ESP32 Dev Module").
-3. Go to "Tools" → "Port."
-4. Select the COM port associated with your ESP32 (e.g., `COM3` on Windows or `/dev/ttyUSB0` on Linux).
+-  Go to "Tools" → "Board."
+-  Select your ESP32 board model (e.g., "ESP32 Dev Module").
+-  Go to "Tools" → "Port."
+-  Select the COM port associated with your ESP32 (e.g., =COM3= on Windows or =/dev/ttyUSB0= on Linux).
 
 *** Upload the Sketch
 :PROPERTIES:
 :CUSTOM_ID: upload-the-sketch
 :END:
-1. Click the "Upload" button (right arrow icon) in the Arduino IDE toolbar.
-2. Monitor the IDE output for the upload progress.
+-  Click the "Upload" button (right arrow icon) in the Arduino IDE toolbar.
+-  Monitor the IDE output for the upload progress.
    - If you see a "Connecting..." message, press and hold the "Boot" button on your ESP32 until the upload starts.
 
 *** Verify the Output
@@ -288,11 +289,11 @@ SDA          | GPIO 21 (default I2C SDA on ESP32)
 :PROPERTIES:
 :CUSTOM_ID: troubleshooting
 :END:
-1. If the upload fails:
+ - If the upload fails:
    - Ensure the correct board and port are selected.
    - Check the USB cable and connections.
    - Press and hold the "Boot" button while uploading.
-2. If the MPU6050 or WebSocket fails:
+-  If the MPU6050 or WebSocket fails:
    - Check wiring for the MPU6050.
    - Verify the WiFi credentials.
    - Ensure the libraries are installed correctly.
@@ -301,7 +302,7 @@ SDA          | GPIO 21 (default I2C SDA on ESP32)
 :PROPERTIES:
 :CUSTOM_ID: notes
 :END:
-- Adjust the `delay(50)` in the loop for a different data update rate.
+- Adjust the =delay(50)= in the loop for a different data update rate.
 
 ** How to Open Port 12345 on Your Device
 :PROPERTIES:
@@ -313,7 +314,7 @@ This guide provides instructions to open port 12345 on your device for the WebSo
 :PROPERTIES:
 :CUSTOM_ID: determine-your-operating-system
 :END:
-1. Identify whether you are using:
+-  Identify whether you are using:
    - Windows
    - macOS
    - Linux
@@ -322,42 +323,38 @@ This guide provides instructions to open port 12345 on your device for the WebSo
 :PROPERTIES:
 :CUSTOM_ID: open-port-on-windows
 :END:
-1. Open the Command Prompt as an Administrator:
-   - Press `Win + R`, type `cmd`, and press `Enter`.
+-  Open the Command Prompt as an Administrator:
+   - Press =Win + R=, type =cmd=, and press =Enter=.
    - Right-click "Command Prompt" and select "Run as Administrator."
 
 2. Add a Firewall Rule to Open the Port:
    - Run the following command:
-     ```shell
-     netsh advfirewall firewall add rule name="Open Port 12345" dir=in action=allow protocol=TCP localport=12345
-     ```
-   - For UDP, replace `TCP` with `UDP` in the command.
+     =shell=
+     =netsh advfirewall firewall add rule name="Open Port 12345" dir=in action=allow protocol=TCP localport=12345=
+   - For UDP, replace =TCP= with =UDP= in the command.
 
 3. Verify the Rule:
    - Run:
-     ```shell
-     netsh advfirewall firewall show rule name="Open Port 12345"
-     ```
+     =shell=
+     =netsh advfirewall firewall show rule name="Open Port 12345"=
 
 *** Open Port on macOS
 :PROPERTIES:
 :CUSTOM_ID: open-port-on-macos
 :END:
 1. Open the Terminal:
-   - Use `Cmd + Space` to open Spotlight and type "Terminal."
+   - Use =Cmd + Space= to open Spotlight and type "Terminal."
 
 2. Modify the Firewall Settings:
    - Run the following command to allow incoming connections on port 12345:
-     ```shell
-     sudo pfctl -e
-     echo "pass in proto tcp from any to any port 12345" | sudo pfctl -f -
-     ```
+     =shell=
+     =sudo pfctl -e=
+     =echo "pass in proto tcp from any to any port 12345" | sudo pfctl -f -=
 
 3. Verify the Configuration:
    - Check active rules:
-     ```shell
-     sudo pfctl -sr
-     ```
+     =shell=
+     =sudo pfctl -sr=
 
 *** Open Port on Linux
 :PROPERTIES:
