@@ -18,7 +18,7 @@
     - [[#esp32-microcontroller][esp32 Microcontroller]]
     - [[#mpu6050-accelerometer][mpu6050 Accelerometer]]
     - [[#jumper-wires][Jumper Wires]]
-    - [[#microusb-cabel][MicroUSB Cabel]]
+    - [[#microusb-cable][MicroUSB Cable]]
     - [[#optionally-a-breadboard][(Optionally) A Breadboard]]
   - [[#software][Software]]
     - [[#twilio-credentials][Twilio Credentials]]
@@ -65,7 +65,7 @@
   - [[#acceleration-due-to-gravity][Acceleration Due To Gravity]]
   - [[#csv-file][CSV File]]
 - [[#how-this-works][How This Works]]
-- [[#limitations--workaround][Limitations & Workaround]]
+- [[#limitations--workarounds][Limitations & Workarounds]]
   - [[#range][Range]]
   - [[#accuracy-of-geolocation][Accuracy Of Geolocation]]
   - [[#powersupply][PowerSupply]]
@@ -99,11 +99,11 @@ This code assumes you’re using an mpu6050 but it should be possible to modify 
 :CUSTOM_ID: jumper-wires
 :END:
 Jumper wires are required to wire the esp32 and the mpu6050.
-*** MicroUSB Cabel
+*** MicroUSB Cable
 :PROPERTIES:
-:CUSTOM_ID: microusb-cabel
+:CUSTOM_ID: microusb-cable
 :END:
-The esp32 uses a microusb cabel to connect to your developement machine. I am also using the microusb cabel to power the esp32 instead of an extenal battery.
+The esp32 uses a microusb cable to connect to your developement machine. I am also using the microusb cable to power the esp32 instead of an extenal battery.
 *** (Optionally) A Breadboard
 :PROPERTIES:
 :CUSTOM_ID: optionally-a-breadboard
@@ -282,7 +282,7 @@ Download the arduinoIDE from [[https://arduino.cc/en/software][here]].
 :END:
 1. Once the upload completes, open the Serial Monitor:
    - Go to "Tools" → "Serial Monitor."
-   - Set the baud rate to `115200` (as specified in the code).
+   - Set the baud rate to =115200= (as specified in the code).
 2. Check the monitor for messages indicating WiFi connection status, MPU6050 calibration, and WebSocket activity.
 
 *** Troubleshooting
@@ -292,7 +292,7 @@ Download the arduinoIDE from [[https://arduino.cc/en/software][here]].
  - If the upload fails:
    - Ensure the correct board and port are selected.
    - Check the USB cable and connections.
-   - Press and hold the "Boot" button while uploading.
+   - Press and hold the =Boot= button while uploading.
 -  If the MPU6050 or WebSocket fails:
    - Check wiring for the MPU6050.
    - Verify the WiFi credentials.
@@ -329,14 +329,18 @@ This guide provides instructions to open port 12345 on your device for the WebSo
 
 2. Add a Firewall Rule to Open the Port:
    - Run the following command:
-     =shell=
-     =netsh advfirewall firewall add rule name="Open Port 12345" dir=in action=allow protocol=TCP localport=12345=
-   - For UDP, replace =TCP= with =UDP= in the command.
+#+begin_example
+shell
+netsh advfirewall firewall add rule name="Open Port 12345" dir=in action=allow protocol=TCP localport=12345
+For UDP, replace =TCP= with =UDP= in the command.
+#+end_example
 
 3. Verify the Rule:
    - Run:
-     =shell=
-     =netsh advfirewall firewall show rule name="Open Port 12345"=
+#+begin_example
+shell
+netsh advfirewall firewall show rule name="Open Port 12345"
+#+end_example
 
 *** Open Port on macOS
 :PROPERTIES:
@@ -347,14 +351,19 @@ This guide provides instructions to open port 12345 on your device for the WebSo
 
 2. Modify the Firewall Settings:
    - Run the following command to allow incoming connections on port 12345:
-     =shell=
-     =sudo pfctl -e=
-     =echo "pass in proto tcp from any to any port 12345" | sudo pfctl -f -=
+
+#+begin_example
+shell
+sudo pfctl -e
+echo "pass in proto tcp from any to any port 12345" | sudo pfctl -f -
+#+end_example
 
 3. Verify the Configuration:
    - Check active rules:
-     =shell=
-     =sudo pfctl -sr=
+#+begin_example
+shell
+sudo pfctl -sr
+#+end_example
 
 *** Open Port on Linux
 :PROPERTIES:
@@ -367,18 +376,23 @@ If you’re on linux, you’ll probably figure it out :)
 :CUSTOM_ID: execution
 :END:
 - Power the esp32
+  
    A red led on the esp32 along with a green led on the mpu6050 should start glowing.
    
 - Clone the repo
+  
    =git clone https://github.com/strix007/esp32_fall-detector.git=
 
 - CD into the directory
+  
     =cd esp32_fall-detector=
 
 - Run Poetry
+  
       =poetry install=
 
 - Run the script
+  
   =poetry run python liveFallDetector.py=
 
 * First Run
@@ -441,9 +455,9 @@ Name of the .csv file where the data is logged.
 :CUSTOM_ID: how-this-works
 :END:
   To make this script work, we are taking the magnitudes of the x,y and z axes and comparing it against a predefined fall threshold we got through trial and error and experimentation. When a value above the threshold is detected, a increment in fall count takes place. When the fallcount exceeds a certains threshold, the fall mechanish that send a SOS message along with the location is triggered. We are the approach of taking fallcount to reduce fall postives as there can be a simple increase in velocity maginitude with a sudden jerk or motion without it being fall. This approach reduces false postives. We are also getting the location of the esp32 by scanning the local Wifis in the area and sending their IP addressed to the google geolocation api.
-* Limitations & Workaround
+* Limitations & Workarounds
 :PROPERTIES:
-:CUSTOM_ID: limitations--workaround
+:CUSTOM_ID: limitations--workarounds
 :END:
 ** Range
 :PROPERTIES:
